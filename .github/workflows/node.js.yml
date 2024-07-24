@@ -1,30 +1,46 @@
-# This workflow will do a clean install of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
-
 name: Node.js CI
 
 on:
+  watch:
+    types: started
   schedule:
-    # * is a special character in YAML so you have to quote this string
-    - cron: '0 * * * *'
+    - cron: '00 0 * * *'
 
 jobs:
-  download:
+  build:
 
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-node@v3
-    - run: echo "$(date)" > output/.lastrun
-    - run: npm ci
-    - run: node download --output output/all-cdn.txt
-    - run: for f in providers/*.js; do FILENAME=${f%%.*}; FILENAME=${FILENAME##*/}; node download --provider ${FILENAME} --output output/${FILENAME}.txt;  done;
-    - uses: actions/upload-artifact@v3
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Install Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 'latest'
+    
+    - name: Download list
+      run : |
+        echo "$(date)" > output/.lastrun
+        npm install
+        npm audit fix --force
+        node download --output output/all-cdn.txt
+
+        for f in providers/*.js; do 
+          FILENAME=${f%%.*}; 
+          FILENAME=${FILENAME##*/}; 
+          node download --provider ${FILENAME} --output output/${FILENAME}.txt;  
+        done;
+
+    - name: Upload files
+      uses: actions/upload-artifact@v4
       with:
         path: output/
-    - run: |
-        git config --global user.name 'node.js Action'
-        git config --global user.email 'root@schniggie.de'
-        git commit -am "Automated commit, updated cdn ranges"
-        git push
+        
+    - name: Apply
+      run: |
+        Emoji=("🎉" "🤞" "✨" "🎁" "🎈" "🎄" "🎨" "💋" "🍓" "🍕" "🍉" "💐" "🌴" "🚀" "🛸" "🗽" "⛅" "🌈" "🔥" "⛄" "🐶" "🏅" "🦄" "🐤")
+        git add .
+        git commit -m "${Emoji[$[$RANDOM % ${#Emoji[@]}]]} Sync $(date +%Y-%m-%d" "%H:%M:%S)"
+        git push -f
