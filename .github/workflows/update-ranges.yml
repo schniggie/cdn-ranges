@@ -1,0 +1,52 @@
+name: Update CDN ranges
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# Never let two scheduled runs race each other on the push
+concurrency:
+  group: update-ranges
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Build
+        run: go build -o /tmp/cdn-ranges ./cmd/cdn-ranges
+
+      - name: Fetch ranges
+        run: scripts/update-output.sh /tmp/cdn-ranges
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cdn-ranges
+          path: output/
+          retention-days: 7
+
+      - name: Commit and push
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add output/
+          # .lastrun changes every run; only commit when actual ranges changed
+          if git diff --cached --quiet -- ':output' ':!output/.lastrun'; then
+            echo "No range changes"
+            exit 0
+          fi
+          git commit -m "Automated commit, updated cdn ranges"
+          git push
