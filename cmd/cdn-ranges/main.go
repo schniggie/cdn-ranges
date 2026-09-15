@@ -27,10 +27,22 @@ type Output struct {
 func main() {
 	outputFlag := flag.String("output", "ranges.txt", "output file name")
 	formatFlag := flag.String("format", "txt", "output format (txt, csv, json)")
-	providerFlag := flag.String("provider", "", "provider name in lowercase")
-	v4Flag := flag.Bool("v4", false, "Fetch IPv4 ranges only")
-	v6Flag := flag.Bool("v6", false, "Fetch IPv6 ranges only")
+	providerFlag := flag.String("provider", "", "provider name (case insensitive)")
+	listFlag := flag.Bool("list", false, "List available providers and exit")
+	var v4Only, v6Only bool
+	flag.BoolVar(&v4Only, "ipv4", false, "Fetch IPv4 ranges only")
+	flag.BoolVar(&v4Only, "v4", false, "Alias for -ipv4")
+	flag.BoolVar(&v6Only, "ipv6", false, "Fetch IPv6 ranges only")
+	flag.BoolVar(&v6Only, "v6", false, "Alias for -ipv6")
 	flag.Parse()
+	v4Flag, v6Flag := &v4Only, &v6Only
+
+	if *listFlag {
+		for _, p := range provider.Providers {
+			fmt.Println(strings.ToLower(p.Name()))
+		}
+		return
+	}
 
 	if !slices.Contains(formats, *formatFlag) {
 		fmt.Println("[Fatal] Format must be one of (txt, csv, json)")
@@ -69,7 +81,7 @@ func main() {
 
 	outputFile, err := os.Create(*outputFlag)
 	if err != nil {
-		fmt.Printf("[Fatal] Failed to create output file: %w\n", err)
+		fmt.Printf("[Fatal] Failed to create output file: %v\n", err)
 		os.Exit(1)
 	}
 	defer outputFile.Close()
@@ -162,7 +174,7 @@ func main() {
 
 	// Wait for data fetch to finish
 	if err := g.Wait(); err != nil {
-		fmt.Printf("[Fatal] Failed to fetch ranges: %w\n", err)
+		fmt.Printf("[Fatal] Failed to fetch ranges: %v\n", err)
 		os.Exit(1)
 	}
 
