@@ -51,3 +51,22 @@ func ASNPrefixes(ctx context.Context, asn int) ([]string, []string, error) {
 
 	return response.Routes.V4, response.Routes.V6, nil
 }
+
+// ASNsPrefixes fetches and concatenates the IPv4 and IPv6 prefixes of multiple ASNs
+func ASNsPrefixes(ctx context.Context, asns ...int) ([]string, []string, error) {
+	var (
+		v4 []string
+		v6 []string
+	)
+	for _, asn := range asns {
+		asnV4, asnV6, err := ASNPrefixes(ctx, asn)
+		if err != nil {
+			return nil, nil, fmt.Errorf("AS%d: %w", asn, err)
+		}
+
+		v4 = append(v4, asnV4...)
+		v6 = append(v6, asnV6...)
+	}
+
+	return v4, v6, nil
+}

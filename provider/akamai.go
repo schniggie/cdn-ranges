@@ -57,19 +57,5 @@ func (p *Akamai) Name() string {
 }
 
 func (p *Akamai) Fetch(ctx context.Context) ([]string, []string, error) {
-	var (
-		v4 []string
-		v6 []string
-	)
-	for _, asn := range AkamaiASNs {
-		asn_v4, asn_v6, err := cdn_ranges.ASNPrefixes(ctx, asn)
-		if err != nil {
-			return nil, nil, err
-		}
-
-		v4 = append(v4, asn_v4...)
-		v6 = append(v6, asn_v6...)
-	}
-
-	return v4, v6, nil
+	return cdn_ranges.ASNsPrefixes(ctx, AkamaiASNs...)
 }

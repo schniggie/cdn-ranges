@@ -10,10 +10,15 @@ var _ Provider = (*CDNetworks)(nil)
 
 type CDNetworks struct{}
 
+var CDNetworksASNs = []int{
+	36408, // CDNETWORKSUS
+	38107, // CDNETWORKS-AS-KR
+}
+
 func (p *CDNetworks) Name() string {
 	return "CDNetworks"
 }
 
 func (p *CDNetworks) Fetch(ctx context.Context) ([]string, []string, error) {
-	return cdn_ranges.ASNPrefixes(ctx, 36408)
+	return cdn_ranges.ASNsPrefixes(ctx, CDNetworksASNs...)
 }
