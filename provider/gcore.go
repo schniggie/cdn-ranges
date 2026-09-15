@@ -27,7 +27,7 @@ func (p *GCore) Fetch(ctx context.Context) ([]string, []string, error) {
 		return nil, nil, err
 	}
 
-	var response FastlyResponse
+	var response GCoreResponse
 	if err := json.Unmarshal(resp, &response); err != nil {
 		return nil, nil, fmt.Errorf("failed to unmarshal json: %w", err)
 	}

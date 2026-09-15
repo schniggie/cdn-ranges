@@ -20,13 +20,11 @@ func (p *Cloudflare) Fetch(ctx context.Context) ([]string, []string, error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	v4 := strings.Split(string(respV4), "\n")
 
 	respV6, err := cdn_ranges.HttpGet(ctx, "https://www.cloudflare.com/ips-v6")
 	if err != nil {
 		return nil, nil, err
 	}
-	v6 := strings.Split(string(respV6), "\n")
 
-	return v4[:len(v4)-1], v4[:len(v6)-1], nil
+	return strings.Fields(string(respV4)), strings.Fields(string(respV6)), nil
 }

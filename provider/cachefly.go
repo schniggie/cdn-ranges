@@ -21,6 +21,5 @@ func (p *CacheFly) Fetch(ctx context.Context) ([]string, []string, error) {
 		return nil, nil, err
 	}
 
-	v4 := strings.Split(string(resp), "\n")
-	return v4[:len(v4)-1], nil, nil
+	return strings.Fields(string(resp)), nil, nil
 }

@@ -54,7 +54,7 @@ func (p *Cloudfront) Fetch(ctx context.Context) ([]string, []string, error) {
 	var v6 []string
 	for _, prefix := range response.Ipv6Prefixes {
 		if prefix.Service == "CLOUDFRONT" {
-			v4 = append(v4, prefix.Ipv6Prefix)
+			v6 = append(v6, prefix.Ipv6Prefix)
 		}
 	}
 
