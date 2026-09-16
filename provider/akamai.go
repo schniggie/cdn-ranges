@@ -50,6 +50,10 @@ var AkamaiASNs = []int{
 	63949,
 	133103,
 	393560,
+	// Prolexic DDoS mitigation network (Akamai)
+	32787,
+	49846,
+	213120,
 }
 
 func (p *Akamai) Name() string {
