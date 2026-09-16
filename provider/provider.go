@@ -27,7 +27,6 @@ var Providers = []Provider{
 	&Fastly{},
 	&GCore{},
 	&Imperva{},
-	&Leaseweb{},
 	&Limelight{},
 	&Medianova{},
 	&Qrator{},
