@@ -14,7 +14,7 @@ type GCore struct{}
 
 type GCoreResponse struct {
 	Addresses     []string `json:"addresses"`
-	Ipv6Addresses []string `json:"ipv6_addresses"`
+	Ipv6Addresses []string `json:"addresses_v6"`
 }
 
 func (p *GCore) Name() string {

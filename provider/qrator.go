@@ -13,6 +13,9 @@ type Qrator struct{}
 var QratorASNs = []int{
 	200449, // QRATOR-CZ
 	209671, // QRATOR-SW
+	211112, // QRATOR-FZ
+	197068, // HLL (Qrator)
+	51115,  // HLL-AS
 }
 
 func (p *Qrator) Name() string {

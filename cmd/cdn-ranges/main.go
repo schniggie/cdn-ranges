@@ -13,6 +13,7 @@ import (
 
 	"golang.org/x/sync/errgroup"
 
+	cdn_ranges "github.com/taythebot/cdn-ranges"
 	"github.com/taythebot/cdn-ranges/provider"
 )
 
@@ -142,9 +143,18 @@ func main() {
 			for p := range queue {
 				fmt.Printf("[Info] Fetching %s ranges\n", p.Name())
 
-				v4, v6, err := p.Fetch(ctx)
+				rawV4, rawV6, err := p.Fetch(ctx)
 				if err != nil {
 					return fmt.Errorf("failed to fetch %s ranges: %w", p.Name(), err)
+				}
+
+				v4, v6, err := cdn_ranges.Sanitize(append(rawV4, rawV6...))
+				if err != nil {
+					return fmt.Errorf("%s returned bad data: %w", p.Name(), err)
+				}
+
+				if len(v4)+len(v6) == 0 {
+					fmt.Printf("[Warn] %s returned no ranges\n", p.Name())
 				}
 
 				if *v4Flag || (!*v4Flag && !*v6Flag) {

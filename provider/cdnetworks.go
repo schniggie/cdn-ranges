@@ -11,8 +11,9 @@ var _ Provider = (*CDNetworks)(nil)
 type CDNetworks struct{}
 
 var CDNetworksASNs = []int{
-	36408, // CDNETWORKSUS
-	38107, // CDNETWORKS-AS-KR
+	36408,  // CDNETWORKSUS
+	38107,  // CDNETWORKS-AS-KR
+	204720, // CDNetworks Global Cloud Network
 }
 
 func (p *CDNetworks) Name() string {
