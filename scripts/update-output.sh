@@ -31,8 +31,8 @@ new_csv="$(mktemp)"
 trap 'rm -f "${new_csv}"' EXIT
 "${bin}" -format csv -output "${new_csv}"
 
-count_provider() { # <csv> <lowercase provider>
-  awk -F, -v p="$2" 'NR > 1 && tolower($1) == p { n++ } END { print n + 0 }' "$1"
+count_provider() { # <csv> <provider, any case>
+  awk -F, -v p="$2" 'NR > 1 && tolower($1) == tolower(p) { n++ } END { print n + 0 }' "$1"
 }
 count_all() {
   awk 'NR > 1 { n++ } END { print n + 0 }' "$1"
@@ -66,10 +66,11 @@ awk -F, 'NR > 1 && $2 == "ipv4" { print $3 }' "${out}/all-cdn.csv" > "${out}/all
 awk -F, 'NR > 1 && $2 == "ipv6" { print $3 }' "${out}/all-cdn.csv" > "${out}/all-cdn-ipv6.txt"
 
 while read -r provider; do
-  awk -F, -v p="${provider}" 'NR > 1 && tolower($1) == p && $2 == "ipv4" { print $3 }' \
-    "${out}/all-cdn.csv" > "${out}/${provider}.txt"
-  awk -F, -v p="${provider}" 'NR > 1 && tolower($1) == p && $2 == "ipv6" { print $3 }' \
-    "${out}/all-cdn.csv" > "${out}/${provider}-ipv6.txt"
+  file="${out}/${provider,,}"
+  awk -F, -v p="${provider}" 'NR > 1 && tolower($1) == tolower(p) && $2 == "ipv4" { print $3 }' \
+    "${out}/all-cdn.csv" > "${file}.txt"
+  awk -F, -v p="${provider}" 'NR > 1 && tolower($1) == tolower(p) && $2 == "ipv6" { print $3 }' \
+    "${out}/all-cdn.csv" > "${file}-ipv6.txt"
 done < <("${bin}" -list)
 
 date -u +"%Y-%m-%dT%H:%M:%SZ" > "${out}/.lastrun"
